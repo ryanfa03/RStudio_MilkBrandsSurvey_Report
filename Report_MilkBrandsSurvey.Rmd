@@ -1,0 +1,261 @@
+---
+output:
+  html_document: 
+    number_sections: yes
+  pdf_document: 
+    fig_height: 5
+    fig_width: 6.5
+    highlight: tango
+    number_sections: yes
+    toc_depth: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+******************************************************
+Nama     : Ryan Ferdinand Andyson
+NIM      : 00000058006
+Kelas    : IS240 CL
+******************************************************
+
+## Panggil semua package yang diperlukan.
+```{r, message=FALSE}
+library(readxl) 
+library(moments) 
+library(nortest) 
+library(qualityTools) 
+library(ggplot2) 
+library(dplyr)
+```
+
+## Impor Data
+```{r, message=FALSE}
+project <- readxl::read_excel("dataproject.xlsx", sheet = "data")
+```
+
+## 1. Exploratory Data Analysis
+## VARIABEL KATEGORIKAL
+## Distribusi Frekuensi Seringnya Minum Susu Kemasan
+```{r, message=FALSE}
+(tab <- table(project$rangesering))
+sbX <- "Range"
+sbY <- "Frekuensi"
+barplot(tab, main = "Distribusi Frekuensi Seringnya Minum Susu Kemasan", names.arg = c(1,2,3,4,5), xlab = sbX, ylab = sbY)
+
+#Pada grafik di atas, frekuensi seringnya minum kemasan yang paling banyak terdapat pada range 4, frekuensi seringnya minum kemasan yang paling sedikit terdapat pada range 1. Range 1 dipilih sebanyak 8 responden, Range 2 dipilih sebanyak 11 responden, Range 3 dipilih sebanyak 30 responden, Range 4 dipilih sebanyak 35 responden, dan Range 5 dipilih sebanyak 16.
+```
+
+## Distribusi Merek Susu Kemasan yang Disukai
+```{r, message=FALSE}
+(tab <- table(project$mereksuka))
+sbX <- "Merek"
+sbY <- "Frekuensi"
+barplot(tab, main = "Distribusi Merek Susu Kemasan yang Disukai", names.arg = c("Frisian Flag", "Greenfields", "Indomilk", "Ultra Milk"), xlab = sbX, ylab = sbY)
+
+#Pada grafik di atas, frekuensi merek susu kemasan yang paling banyak disukai adalah Ultra Milk, sedangkan merek susu kemasan yang paling sedikit disukai adalah Indomilk. Merek Frisian Flag dipilih sebanyak 11 responden, merek Greenfields dipilih sebanyak 23 responden, merek Indomilk dipilih sebanyak 8 responden, dan merek Ultra Milk dipilih sebanyak 58 responden.
+
+#Distribusi Merek Susu Kemasan yang Kurang Disukai
+(tab <- table(project$merekkurangsuka))
+sbX <- "Merek"
+sbY <- "Frekuensi"
+barplot(tab, main = "Distribusi Merek Susu Kemasan yang Kurang Disukai", names.arg = c("Frisian Flag", "Greenfields", "Indomilk", "Ultra Milk"), xlab = sbX, ylab = sbY)
+
+#Pada grafik di atas, frekuensi merek susu kemasan yang paling banyak kurang disukai adalah Indomilk, sedangkan merek susu kemasan yang paling sedikit kurang disukai adalah Ultra Milk. Merek Frisian Flag dipilih sebanyak 30 responden, merek Greenfields dipilih sebanyak 29 responden, merek Indomilk dipilih sebanyak 35 responden, dan merek Ultra Milk dipilih sebanyak 6 responden.
+```
+
+## Distribusi Frekuensi Tempat Membeli Susu Kemasan
+```{r, message=FALSE}
+(tab <- table(project$tempatbeli))
+sbX <- "Tempat"
+sbY <- "Frekuensi"
+barplot(tab, main = "Distribusi Frekuensi Tempat Membeli Susu Kemasan", names.arg = c("Hypermarket", "Minimarket", "Supermarket", "Toko"), xlab = sbX, ylab = sbY)
+
+#Responden dapat memilih lebih dari 1 pilihan jawaban. Pada grafik di atas, frekuensi tempat yang paling banyak dipilih responden untuk membeli susu kemasan adalah Minimarket, sedangkan frekuensi tempat yang paling sedikit dipilih responden untuk membeli susu kemasan adalah Toko. Hypermarket dipilih sebanyak 28 responden, MInimarket dipilih sebanyak 82 responden, Supermarket dipilih sebanyak 63 responden, dan Toko dipilih sebanyak 24 responden.
+```
+
+## Distribusi Frekuensi Waktu Konsumsi Susu Kemasan
+```{r, message=FALSE}
+(tab <- table(project$waktukonsumsi))
+sbX <- "Waktu"
+sbY <- "Frekuensi"
+barplot(tab, main = "Distribusi Frekuensi Waktu Konsumsi Susu Kemasan", names.arg = c("Malam Hari", "Pagi Hari", "Siang Hari", "Sore Hari"), xlab = sbX, ylab = sbY)
+
+#Responden dapat memilih lebih dari 1 pilihan jawaban. Pada grafik di atas, frekuensi waktu untuk mengonsumsi susu kemasan yang paling banyak dipilih responden adalah pagi hari, sedangkan frekuensi waktu untuk mengonsumsi susu kemasan yang paling sedikit dipilih responden adalah Sore Hari. Malam hari dipilih sebanyak 47 responden, pagi hari dipilih sebanyak 54 responden, siang hari dipilih sebanyak 33 responden, dan sore hari dipilih sebanyak 23 responden.
+```
+
+## VARIABEL NUMERIK
+## QQ Plot Biaya Pembelian Susu Kemasan
+```{r, message=FALSE}
+qqnorm(project$biaya, main = "QQ Plot Biaya Pembelian Susu Kemasan")
+qqline(project$biaya)
+
+stats::shapiro.test(project$biaya)
+
+#Pada grafik tersebut, ditunjukkan QQ Plot Biaya Pembelian Susu Kemasan. Setelah dilakukan uji normalitas menggunakan shapiro test, didapatkan p-value sebesar 0.05075. Karena 0.05075 > 0,05, maka data tersebut berdistribusi normal.
+```
+
+## QQ Plot Jarak Tempuh untuk Membeli Susu Kemasan
+```{r, message=FALSE}
+project <- readxl::read_excel("dataproject.xlsx", sheet = "data")
+qqnorm(project$jarak, main = "QQ Plot Jarak Tempuh untuk Membeli Susu Kemasan")
+qqline(project$jarak)
+
+stats::shapiro.test(project$jarak)
+
+#Pada grafik di atas, ditunjukkan QQ Plot Jarak Tempuh untuk Membeli Susu Kemasan. Setelah dilakukan shapiro test, didapatkan p-value sebesar 0,0686. Karena 0,0686 > 0,05, maka data tersebut berdistribusi normal.
+```
+
+## QQ Plot Kemasan Susu yang Dibeli dalam Sekali Pembelian
+```{r, message=FALSE}
+qqnorm(project$kemasanbeli, main = "QQ Plot Kemasan Susu yang Dibeli dalam Sekali Pembelian")
+qqline(project$kemasanbeli)
+
+stats::shapiro.test(project$kemasanbeli)
+
+#Pada grafik di atas, ditunjukkan QQ Plot Kemasan Susu yang Dibeli dalam Sekali Pembelian. Setelah dilakukan shapiro test, didapatkan p-value sebesar 0,2495. Karena 0,2495 > 0,05 maka data tersebut berdistribusi normal.
+``` 
+
+## QQ Plot Jumlah Kemasan Susu Dikonsumsi per Bulan
+```{r, message=FALSE}
+qqnorm(project$kemasankonsumsi, main = "QQ Plot Jumlah Kemasan Susu Dikonsumsi per Bulan")
+qqline(project$kemasankonsumsi)
+
+stats::shapiro.test(project$kemasankonsumsi)
+
+# Pada grafik di atas, ditunjukkan QQ plot jumlah kemasan susu yang dikonsumsi per bulan. Setelah dilakukan shapiro test, didapatkan p-value sebesar 9.962e-13. Karena 9.962e13 < 0,05, maka data di atas tidak berdistribusi normal.
+```
+
+# 2. Parametric Statistic Analysis
+# a. ANOVA (Untuk menganalisis jumlah kemasan susu yang dibeli dalam sekali pembelian dengan mengambil sampel berdasarkan merek yang disukai)
+```{r, message=FALSE}
+#Panggil package yang diperlukan
+library(readxl)
+library(car)
+
+#Impor data
+kemasan <- readxl::read_excel("dataproject.xlsx", sheet = "kemasanbeli")
+
+#Melakukan analisa deskriptif pada mean jumlah kemasan yang dibeli dalam sekali pembelian berdasarkan merek susu kemasan yang disukai
+apply(kemasan, 2, mean, na.rm = TRUE)
+stackkemasan <- stack(kemasan)
+boxplot(values ~ ind, data = stackkemasan, horizontal = TRUE)
+
+#Melakukan uji normalitas pada jumlah kemasan pada sekali pembelian berdasarkan merek susu kemasan yang disukai.
+apply(kemasan, 2, shapiro.test)
+#untuk data kolom Ultra Milk bersifat gaussian
+#untuk data kolom Frisian Flag bersifat gaussian
+#untuk data kolom Indomilk bersifat gaussian
+#untuk data kolom Greenfields bersifat gaussian
+
+#Melakukan tes varians pada data tersebut
+apply(kemasan, 2, var, na.rm = TRUE)
+#Dapat ditarik kesimpulan bahwa varians datanya berbeda.
+
+#Melakukan uji hipotesa kesamaan varians levene
+car::leveneTest(values ~ ind, data = stackkemasan)
+#Hasil uji hipotesa kesamaan varians levene menyimpulkan tidak ada perbedaan signifikan pada varians dari kedua populasi.
+ 
+#Uji ANOVA pada signifikansi 5%
+hasil <- aov(values ~ ind, data = stackkemasan)
+summary(hasil)
+#Hipotesis:
+#H0: Tidak terdapat perbedaan rata-rata jumlah kemasan yang dibeli dalam sekali pembelian berdasarkan merek susu kemasan yang disukai.
+#Ha: Terdapat perbedaan rata-rata jumlah kemasan yang dibeli dalam sekali pembelian berdasarkan merek susu kemasan yang disukai.
+
+#Setelah dilakukan uji ANOVA, didapatkan p-value 0.827. p-value tersebut > 0.05 yang menunjukkan penerimaan hipotesa null pada alpha 5%, yang artinya tidak terdapat minimal satu mean populasi jumlah kemasan yang dibeli dalam sekali pembelian berdasarkan merek susu kemasan yang disukai yang berbeda.
+
+```
+
+# b. Multilinear Regression (Membuat model regresi linier berganda yang bisa menggambarkan hubungan antara biaya yang dikeluarkan untuk membeli susu kemasan dalam sekali pembelian dengan jumlah kemasan susu dalam sekali pembelian dan jarak tempuh.)
+```{r, message=FALSE}
+#Panggil package yang diperlukan
+library(readxl)
+
+#Impor Data
+project1 <- readxl::read_excel("dataproject.xlsx", sheet = "biayakemasan")
+
+#Melakukan Summary Data
+summary(project1)
+
+#Melakukan scatter plot antara variabel dependen yaitu biaya yang dikeluarkan untuk membeli susu kemasan dalam sekali pembelian dan dua variabel independen numerik, yaitu jumlah kemasan susu dalam sekali pembelian dan jarak.
+plot(project1$kemasanbeli, project1$biaya)
+abline(lm(project1$biaya ~ project1$kemasanbeli), col = "red")
+
+plot(project1$jarak, project1$biaya)
+abline(lm(project1$biaya ~ project1$jarak), col = "red")
+
+#Pola yang kita lihat dari scatter plot ini adalah pola biaya dan jumlah susu kemasan dalam sekali pembelian adalah linear dan pola biaya dan jarak tidak linear. 
+
+cor(project1[,1:3])
+cor.test(project1$biaya, project1$kemasanbeli,method = "pearson", conf.level = 0.95)
+#koefisien korelasi = 0,9849492 
+#Setelah dilakukan perhitungan korelasi dengan metode pearson, didapatkan nilai korelasi Pearson = 0,9849492 pada variabel biaya dan jumlah kemasan pada sekali pembelian yang menunjukkan hubungan linier yang sangat kuat
+
+cor.test(project1$biaya, project1$jarak ,method = "pearson", conf.level = 0.95)
+#koefisien korelasi = 0,1159537 
+#Setelah dilakukan perhitungan korelasi dengan metode pearson, didapatkan nilai korelasi Pearson = 0,1159537, yang menunjukkan hubungan linier antara biaya dan jarak sangat lemah.
+
+#Melakukan fit model antara variabel dependen, yaitu biaya, dan variabel independen, yaitu jumlah kemasan dalam sekali pembelian dan jarak.
+model <- lm(project1$biaya ~ project1$kemasanbeli + project1$jarak, data = project1)
+summary(model)
+
+#Melakukan pengecekan asumsi regresi linier, yaitu pengecekan asumsi untuk fitted values dan residual, uji normalitas, uji otokorelasi, uji homoskedastisitas, dan uji multikolinearitas
+par(mfrow = c(2,2))
+plot(model)
+
+#uji normalitas: ....
+stats::shapiro.test(model$residuals)
+#uji otokorelasi: 
+lmtest::dwtest(model)
+#uji homoskedastisitas:
+lmtest::bptest(model)
+#uji multikolinearitas
+car::vif(model)
+#hasil vif <5 atau 10 maka h0 diterima (h0 = tidak adanya korelasi antara variabel independen dalam model).
+
+#Kesimpulan dari cek asumsi:
+#Kesimpulan dari uji Durbin-watson: tidak ada otokorelasi pada residual.
+#Kesimpulan dari uji Breush-Pagan: varians residual homoskedastis.
+#Kesimpulan dari uji Shapiro-Wilk: residual tidak mengikuti distribusi Gaussian.
+#Kesimpulan dari uji Multikolinearitas: hasil vif <5 atau 10 maka h0 diterima. (h0 = tidak adanya korelasi antara variabel independen dalam model)
+#Kesimpulan dari Q-Q plot: residual Gaussian.
+#Kesimpulan dari plot residual vs fitted values (yˆ): residual homoskedastis.
+
+summary(model)
+#Output dari regresi linier dapat kita simpulkan sebagai berikut:
+#Model signifikan karena dilihat dari p-value untuk uji signifikansi model < 1%. Karena p-valuenya 2,2e-16, yaitu lebih kecil sehingga menandakan modelnya semakin baik atau data cocok dengan model.
+#Model dapat menjelaskan 97% variabilitas dalam variabel (r^2 = 0,9705). Variabilitas bisa dilihat dari adjusted R-squarednya 97%.
+#Untuk penambahan setiap 1 kemasan susu, penambahan biayanya adalah 6.212.
+```
+
+# 3. Non-Parametric Statistics Analysis (Untuk menganalisis jumlah kemasan susu yang dikonsumsi per bulan pada variabel pria dan wanita)
+```{r, message=FALSE}
+#Panggil package yang diperlukan
+library(readxl)
+library(lmtest)
+library(car)
+library(dplyr)
+
+#Impor Data
+kemasankonsumsi <- read_excel("dataproject.xlsx", sheet = "kemasankonsumsi")
+View(kemasankonsumsi)
+
+#Menampilkan struktur dari data
+str(kemasankonsumsi)
+
+#Uji normalitas kemasan susu yang dikonsumsi per bulan pada variabel pria dan wanita menggunakan shapiro test. 
+stats::shapiro.test(kemasankonsumsi$Pria)
+stats::shapiro.test(kemasankonsumsi$Perempuan)
+#Hasil uji normalitas menunjukkan bahwa distribusi normalitas variabel pria dan perempuan tidak mengikuti Gaussian sehingga t-test dapat digunakan untuk uji 2 populasi independen karena tidak mengikuti distribusi Gaussian.
+
+#Berikutnya kita akan melakukan uji Wilcoxon dengan confidence level 0,95 dan terdapat hipotesa sebagai berikut:
+#H0: Mahasiswa Universitas Multimedia Nusantara yang berjenis kelamin pria mengonsumsi lebih sedikit susu kemasan dibandingkan mahasiswa Universitas Multimedia Nusantara yang berjenis kelamin wanita.
+#Ha: Mahasiswa Universitas Multimedia Nusantara yang berjenis kelamin pria mengonsumsi lebih banyak susu kemasan dibandingkan mahasiswa Universitas Multimedia Nusantara yang berjenis kelamin wanita.
+
+wilcox.test(kemasankonsumsi$Pria, kemasankonsumsi$Perempuan, paired = FALSE, alternative = "greater", conf.level = 0.95)
+
+# Kesimpulan: setelah melakukan uji Wilcoxon didapatkan p-value = 0.0003856. Karena p-value = 0.0003856, kita dapat menolak H0 dan didapat kesimpulan bahwa mahasiswa Universitas Multimedia Nusantara yang berjenis kelamin pria mengonsumsi lebih banyak susu kemasan dibandingkan mahasiswa Universitas Multimedia Nusantara yang berjenis kelamin wanita.
+```
+
